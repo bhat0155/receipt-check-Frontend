@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+import Homepage from "./pages/Homepage";
 import FAQPage from "./pages/FAQPage";
 
 function App() {
@@ -42,7 +42,7 @@ function App() {
         {/* Main content area */}
         <main className="max-w-3xl mx-auto p-4">
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<Homepage />} />
             <Route path="/faq" element={<FAQPage />} />
           </Routes>
         </main>
