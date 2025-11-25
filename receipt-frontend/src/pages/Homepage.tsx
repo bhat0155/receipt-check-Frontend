@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { PurchasedItem, RecallMatch } from "../api";
-import { uploadReceipt } from "../api";
+import { uploadReceipt, checkRecalls } from "../api";
 
 // All the high-level states our Home page can be in.
 // We'll use this to drive button disabled/loading states and what UI to show.
@@ -85,8 +85,37 @@ function HomePage() {
     }
   };
 
-  const handleCheckRecallsClick = () => {
-    console.log("TODO: implement check recalls logic in Step 4");
+  const handleCheckRecallsClick = async () => {
+        if(!sessionId){
+            setError("No active session, please upload a receipt to proceed");
+            return;
+        }
+
+        setError(null);
+        setStatus("checking");
+
+        try{
+            const res = await checkRecalls(sessionId);
+            const updated = res.updatedMatches;
+
+            setPurchasedItems(updated.purchasedItems ?? []);
+            setRecallMatches(updated.recallMatches ?? null);
+
+            if(updated.llmError){
+                setError(`AI error while checking recalls ${updated.llmError}`)
+                setStatus("error");
+                return;
+            }
+
+            setStatus("done")
+        }catch(err){
+            if(err instanceof Error){
+                setError(err.message)
+            }else{
+                setError("Something went wrong while checking recalls, please try again later")
+            }
+            setStatus("error")
+        }
   };
 
   // UI helpers based on status
@@ -248,42 +277,74 @@ function HomePage() {
       </section>
 
       {/* Result box (we'll fill the logic in later steps) */}
-      {status === "done" && (
-        <section className="card bg-base-100 shadow-md border border-base-300">
-          <div className="card-body space-y-2">
-            <h2 className="card-title">Result</h2>
+{status === "done" && (
+  <section
+    className={`card shadow-md border ${
+      recallMatches && recallMatches.length > 0
+        ? "border-red-500 bg-red-900/20"    // 🔴 danger: recall found
+        : "border-green-500 bg-green-900/20" // 🟢 safe: no recall
+    }`}
+  >
+    <div className="card-body space-y-3">
+      <h2 className="card-title">
+        {recallMatches && recallMatches.length > 0
+          ? "⚠️ Potential Safety Concern"
+          : "🎉 You're Safe"}
+      </h2>
 
-            {recallMatches && recallMatches.length > 0 ? (
-              <>
-                <p className="text-sm">
-                  We found the following items on your receipt that may be
-                  related to recent recalls:
+      {recallMatches && recallMatches.length > 0 ? (
+        <>
+          <p className="text-sm">
+            We found {recallMatches.length} item
+            {recallMatches.length > 1 ? "s" : ""} on your receipt that may be
+            linked to recent Canadian recalls. Please review the details below
+            and follow the suggested next steps.
+          </p>
+
+          <div className="space-y-4">
+            {recallMatches.map((match, index) => (
+              <div
+                key={index}
+                className="border border-red-400 bg-red-900/30 rounded-lg p-3 space-y-2"
+              >
+                <p>
+                  <span className="font-semibold">Purchased item at risk:</span>{" "}
+                  {match.purchasedItemName}
                 </p>
-                <ul className="list-disc ml-5 space-y-1">
-                  {recallMatches.map((match, index) => (
-                    <li key={index}>
-                      <span className="font-semibold">
-                        {match.purchasedItemName}
-                      </span>
-                      <span className="block text-sm opacity-80">
-                        {match.recallTitle}
-                      </span>
-                      <span className="block text-xs opacity-70">
-                        Reason: {match.reason}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <p className="text-sm">
-                No recalled items were found for this receipt in the recent
-                recall data 🎉
-              </p>
-            )}
+
+                <p className="text-sm">
+                  <span className="font-semibold">Related recall:</span>{" "}
+                  {match.recallTitle}
+                </p>
+
+                <p className="text-sm">
+                  <span className="font-semibold">Reason:</span>{" "}
+                  {match.reason}
+                </p>
+
+                <p className="text-xs opacity-80">
+                  <span className="font-semibold">Next steps:</span>{" "}
+                  Visit the official Government of Canada recalls website and
+                  search for recall ID{" "}
+                  <span className="font-mono">{match.recallId}</span> or the
+                  recall title above. Follow the instructions provided (for
+                  example, stop using the product, throw it out, or return it to
+                  the store if advised).
+                </p>
+              </div>
+            ))}
           </div>
-        </section>
+        </>
+      ) : (
+        <p className="text-sm">
+          No recalled items were found for this receipt in the recent Canadian
+          recall data. Everything looks safe based on the latest 5-day recall
+          window. 🎉
+        </p>
       )}
+    </div>
+  </section>
+)}
     </div>
   );
 }
