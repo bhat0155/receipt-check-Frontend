@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { PurchasedItem, RecallMatch } from "../api";
+import { uploadReceipt } from "../api";
 
 // All the high-level states our Home page can be in.
 // We'll use this to drive button disabled/loading states and what UI to show.
@@ -33,14 +34,55 @@ function HomePage() {
   // Simple error message to show to the user if something goes wrong
   const [error, setError] = useState<string | null>(null);
 
-  // NOTE:
-  // In Step 3 and Step 4 we'll implement these handlers:
-  // - a real "upload & scan" function that uses uploadReceipt + getSession
-  // - a real "check recalls" function that uses checkRecalls
-  //
-  // For now, we just keep placeholders so the file compiles.
-  const handleUploadClick = () => {
-    console.log("TODO: implement upload & scan logic in Step 3");
+
+  const handleUploadClick = async () => {
+    if(!file){
+        setError("Please provide a receipt to proceed");
+        return;
+    }
+
+    // reset error and prev results
+    setError(null);
+    setRecallMatches(null);
+
+    // show loading
+    setStatus("uploading");
+
+    try{
+        // call the backend to upload
+        const session = await uploadReceipt(file);
+
+        setSessionId(session.id);
+        setPurchasedItems(session.purchasedItems ?? []);
+        setRecallMatches(session.recallMatches ?? null);
+
+        // if backend recorded any error show them
+        if (session.ocrError || session.llmError){
+            const messages: string[]=[];
+            if(session.ocrError) messages.push(`OCR error: ${session.ocrError}`)
+            if(session.llmError) messages.push(`LLM error: ${session.llmError}`)
+            setError(messages.join("|"))
+            setStatus("error")
+            return;
+        }
+        
+        // if we received purchasedItems, we are ready for recall btn
+        if(session.purchasedItems && session.purchasedItems.length>0){
+            setStatus("ready")
+        }else{
+            setError("We couldn't detect any items on this receipt. Try a clearer photo or a different receipt.")
+            setStatus("error");
+        }
+
+    }catch(err){
+        console.log(err)
+        if(err instanceof Error){
+            setError(err.message)
+        }else{
+            setError("Something went wrong, please try again later")
+        }
+        setStatus("error")
+    }
   };
 
   const handleCheckRecallsClick = () => {
