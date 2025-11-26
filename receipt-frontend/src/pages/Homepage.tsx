@@ -1,5 +1,3 @@
-import { useState } from "react";
-import type { PurchasedItem, RecallMatch } from "../api";
 import { uploadReceipt, checkRecalls } from "../api";
 import { useHomeContext } from "../states/HomeContext";
 

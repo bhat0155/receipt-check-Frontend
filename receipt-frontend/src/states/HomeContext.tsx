@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { HomeState,HomeActions, FlowStatus } from "./homeTypes";
-import type { PurchasedItem, RecallMatch } from "../api";
+import type { HomeState,HomeActions } from "./homeTypes";
 
 // initial state for home flow
 const initialState: HomeState = {

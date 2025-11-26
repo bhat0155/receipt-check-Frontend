@@ -16,7 +16,7 @@ export interface ReceiptSession {
     id: string;
     createdAt: string;
     purchasedItems: PurchasedItem[] | null;
-    recallMatches: RecallMatch|null;
+    recallMatches: RecallMatch[]|null;
     ocrError: string|null;
     llmError: string | null;
 }
