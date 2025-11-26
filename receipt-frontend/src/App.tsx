@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import FAQPage from "./pages/FAQPage";
+import RecentRecalls from "./pages/RecentRecalls";
 
 function App() {
   return (
@@ -35,6 +36,17 @@ function App() {
                   FAQ
                 </NavLink>
               </li>
+              {/* recent recalls */}
+               <li>
+                <NavLink
+                  to="/recent-recalls"
+                  className={({ isActive }) =>
+                    isActive ? "font-semibold" : undefined
+                  }
+                >
+                  Recalls
+                </NavLink>
+              </li>
             </ul>
           </div>
         </div>
@@ -44,6 +56,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Homepage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/recent-recalls" element={<RecentRecalls />} />
           </Routes>
         </main>
       </div>
