@@ -2,11 +2,13 @@ import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
 import Homepage from "./pages/Homepage";
 import FAQPage from "./pages/FAQPage";
 import RecentRecalls from "./pages/RecentRecalls";
+import { HomeProvider } from "./states/HomeContext";
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-base-200">
+      <HomeProvider>
+           <div className="min-h-screen bg-base-200">
         {/* Navbar */}
         <div className="navbar bg-base-100 shadow-sm">
           <div className="flex-1">
@@ -60,6 +62,7 @@ function App() {
           </Routes>
         </main>
       </div>
+      </HomeProvider>
     </BrowserRouter>
   );
 }

@@ -1,120 +1,94 @@
 import { useState } from "react";
 import type { PurchasedItem, RecallMatch } from "../api";
 import { uploadReceipt, checkRecalls } from "../api";
+import { useHomeContext } from "../states/HomeContext";
 
-// All the high-level states our Home page can be in.
-// We'll use this to drive button disabled/loading states and what UI to show.
-type FlowStatus =
-  | "idle" // nothing started yet
-  | "uploading" // sending image to backend
-  | "processing" // waiting for OCR + LLM to extract items
-  | "ready" // items loaded, ready to check recalls
-  | "checking" // checking recalls via backend
-  | "done" // result ready (recallMatches filled or empty array)
-  | "error"; // some error occurred
 
 function HomePage() {
-  // Which file the user has chosen in the file input
-  const [file, setFile] = useState<File | null>(null);
-
-  // Where we are in the overall flow
-  const [status, setStatus] = useState<FlowStatus>("idle");
-
-  // The session ID we get back from the backend after upload
-  const [sessionId, setSessionId] = useState<string | null>(null);
-
-  // Purchased items returned from Phase 1 (OCR + LLM extraction)
-  const [purchasedItems, setPurchasedItems] = useState<PurchasedItem[]>([]);
-
-  // Recall matches returned from Phase 2 (recall comparison)
-  const [recallMatches, setRecallMatches] = useState<RecallMatch[] | null>(
-    null
-  );
-
-  // Simple error message to show to the user if something goes wrong
-  const [error, setError] = useState<string | null>(null);
+    const {state, actions} = useHomeContext();
+    const {file, status, sessionId, purchasedItems, recallMatches, error} = state
 
 
   const handleUploadClick = async () => {
     if(!file){
-        setError("Please provide a receipt to proceed");
+       actions.setError("Please select a receipt image to proceed")
         return;
     }
 
     // reset error and prev results
-    setError(null);
-    setRecallMatches(null);
+    actions.setError(null);
+    actions.setRecallMatches(null);
 
     // show loading
-    setStatus("uploading");
+    actions.setStatus("uploading");
 
     try{
         // call the backend to upload
         const session = await uploadReceipt(file);
 
-        setSessionId(session.id);
-        setPurchasedItems(session.purchasedItems ?? []);
-        setRecallMatches(session.recallMatches ?? null);
+        actions.setSessionId(session.id);
+        actions.setPurchasedItems(session.purchasedItems ?? []);
+        actions.setRecallMatches(session.recallMatches ?? null);
 
         // if backend recorded any error show them
         if (session.ocrError || session.llmError){
             const messages: string[]=[];
             if(session.ocrError) messages.push(`OCR error: ${session.ocrError}`)
             if(session.llmError) messages.push(`LLM error: ${session.llmError}`)
-            setError(messages.join("|"))
-            setStatus("error")
+            actions.setError(messages.join("|"))
+            actions.setStatus("error")
             return;
         }
         
         // if we received purchasedItems, we are ready for recall btn
         if(session.purchasedItems && session.purchasedItems.length>0){
-            setStatus("ready")
+            actions.setStatus("ready")
         }else{
-            setError("We couldn't detect any items on this receipt. Try a clearer photo or a different receipt.")
-            setStatus("error");
+            actions.setError("We couldn't detect any items on this receipt. Try a clearer photo or a different receipt.")
+            actions.setStatus("error");
         }
 
     }catch(err){
         console.log(err)
         if(err instanceof Error){
-            setError(err.message)
+            actions.setError(err.message)
         }else{
-            setError("Something went wrong, please try again later")
+            actions.setError("Something went wrong, please try again later")
         }
-        setStatus("error")
+        actions.setStatus("error")
     }
   };
 
   const handleCheckRecallsClick = async () => {
         if(!sessionId){
-            setError("No active session, please upload a receipt to proceed");
+            actions.setError("No active session, please upload a receipt to proceed");
             return;
         }
 
-        setError(null);
-        setStatus("checking");
+        actions.setError(null);
+        actions.setStatus("checking");
 
         try{
             const res = await checkRecalls(sessionId);
             const updated = res.updatedMatches;
 
-            setPurchasedItems(updated.purchasedItems ?? []);
-            setRecallMatches(updated.recallMatches ?? null);
+            actions.setPurchasedItems(updated.purchasedItems ?? []);
+            actions.setRecallMatches(updated.recallMatches ?? null);
 
             if(updated.llmError){
-                setError(`AI error while checking recalls ${updated.llmError}`)
-                setStatus("error");
+                actions.setError(`AI error while checking recalls ${updated.llmError}`)
+                actions.setStatus("error");
                 return;
             }
 
-            setStatus("done")
+            actions.setStatus("done")
         }catch(err){
             if(err instanceof Error){
-                setError(err.message)
+                actions.setError(err.message)
             }else{
-                setError("Something went wrong while checking recalls, please try again later")
+                actions.setError("Something went wrong while checking recalls, please try again later")
             }
-            setStatus("error")
+            actions.setStatus("error")
         }
   };
 
@@ -177,13 +151,13 @@ function HomePage() {
             onChange={(e) => {
               // Store the selected file in state
               const selectedFile = e.target.files?.[0] ?? null;
-              setFile(selectedFile);
+              actions.setFile(selectedFile);
               // Clear previous errors/results when user picks a new file
-              setError(null);
-              setSessionId(null);
-              setPurchasedItems([]);
-              setRecallMatches(null);
-              setStatus("idle");
+              actions.setError(null);
+              actions.setSessionId(null);
+              actions.setPurchasedItems([]);
+              actions.setRecallMatches(null);
+              actions.setStatus("idle");
             }}
           />
 
