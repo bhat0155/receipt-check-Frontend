@@ -10,9 +10,19 @@ function FAQPage() {
         </div>
         <div className="collapse-content">
           <p className="text-sm opacity-80">
-            This app lets you upload a shopping receipt, extracts the product
-            names using OCR and AI, and checks them against recent Canadian
-            recall notices from the last few days.
+            Upload a receipt, we extract item names, and check them against recent Canadian recall notices from the last few days.
+          </p>
+        </div>
+      </div>
+
+        <div className="collapse collapse-arrow bg-base-100 shadow">
+        <input type="checkbox" />
+        <div className="collapse-title text-lg font-medium">
+          Do you store my receipts or data?
+        </div>
+        <div className="collapse-content">
+          <p className="text-sm opacity-80">
+            No. Receipts are processed for a temporary session to extract item names and check recalls, then discarded.
           </p>
         </div>
       </div>
@@ -48,17 +58,30 @@ function FAQPage() {
       <div className="collapse collapse-arrow bg-base-100 shadow">
         <input type="checkbox" />
         <div className="collapse-title text-lg font-medium">
+         Where can I find official recalled product list
+        </div>
+        <div className="collapse-content">
+          <p className="text-sm opacity-80">
+           <a href="https://recalls-rappels.canada.ca/en" target="_blank">Click me!</a>
+          </p>
+        </div>
+      </div>
+
+      <div className="collapse collapse-arrow bg-base-100 shadow">
+        <input type="checkbox" />
+        <div className="collapse-title text-lg font-medium">
           Is this an official recall checker?
         </div>
         <div className="collapse-content">
           <p className="text-sm opacity-80">
-            This is a personal project that uses public data. It is not an
-            official government tool. Always verify recalls using the official
-            Government of Canada resources.
+            No, it uses public Government of Canada data but is not an official tool. Always verify on the official site.
           </p>
         </div>
       </div>
     </div>
+
+    
+    
   );
 }
 
