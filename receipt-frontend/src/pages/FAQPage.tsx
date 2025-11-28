@@ -62,7 +62,7 @@ function FAQPage() {
         </div>
         <div className="collapse-content">
           <p className="text-sm opacity-80">
-           <a href="https://recalls-rappels.canada.ca/en" target="_blank">Click me!</a>
+           <a href="https://recalls-rappels.canada.ca/en" target="_blank">https://recalls-rappels.canada.ca/en</a>
           </p>
         </div>
       </div>
@@ -78,6 +78,21 @@ function FAQPage() {
           </p>
         </div>
       </div>
+
+      <div className="collapse collapse-arrow bg-base-100 shadow">
+        <input type="checkbox" />
+        <div className="collapse-title text-lg font-medium">
+          Developer Information / Contact
+        </div>
+        <div className="collapse-content">
+          <p className="text-sm opacity-80">
+        <a href="https:ekamsingh.ca" target="_blank">Ekam Singh Bhatia</a>
+
+          </p>
+        </div>
+      </div>
+
+     
     </div>
 
     

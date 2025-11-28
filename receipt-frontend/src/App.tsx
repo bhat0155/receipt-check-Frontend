@@ -13,7 +13,7 @@ function App() {
         <div className="navbar bg-base-100 shadow-sm">
           <div className="flex-1">
             <Link to="/" className="btn btn-ghost normal-case text-xl">
-              Receipt Recall Checker
+              Receipt Checker
             </Link>
           </div>
           <div className="flex-none">

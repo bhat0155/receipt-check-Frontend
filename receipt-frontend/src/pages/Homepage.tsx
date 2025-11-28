@@ -130,7 +130,7 @@ function HomePage() {
 
       {/* Intro */}
       <section>
-        <h1 className="text-3xl font-bold mb-2">Upload your receipt</h1>
+        <h1 className="text-3xl font-bold mb-2">Upload Your Receipt</h1>
         <p className="text-sm opacity-80">
           We&apos;ll scan your receipt, list your purchased items, and check them
           against recent Canadian recalls (last 5 days).
@@ -189,11 +189,6 @@ function HomePage() {
       <section className="card bg-base-100 shadow-md">
         <div className="card-body">
           <h2 className="card-title">Step 2: Review detected items</h2>
-
-          <p className="text-sm opacity-70 mb-2">
-            Once we scan your receipt, the list of purchased items will appear
-            below.
-          </p>
 
           {/* If we have real items, show them. Otherwise, show placeholder text */}
           {purchasedItems.length > 0 ? (
