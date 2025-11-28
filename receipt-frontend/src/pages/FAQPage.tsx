@@ -86,7 +86,7 @@ function FAQPage() {
         </div>
         <div className="collapse-content">
           <p className="text-sm opacity-80">
-        <a href="https:ekamsingh.ca" target="_blank">Ekam Singh Bhatia</a>
+        <a href="https://ekamsingh.ca" target="_blank">Ekam Singh Bhatia</a>
 
           </p>
         </div>
