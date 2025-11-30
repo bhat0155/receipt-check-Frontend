@@ -168,7 +168,7 @@ function HomePage() {
             )}
 
             <button
-              className={`btn btn-primary w-full border border-white ${
+              className={`btn btn-primary w-full border border-gray-300 ${
                 isUploadingOrProcessing ? "loading" : ""
               }`}
               onClick={handleUploadClick}
@@ -231,7 +231,7 @@ function HomePage() {
             )}
 
             <button
-              className={`btn btn-secondary w-full border border-white ${
+              className={`btn btn-secondary w-full border border-gray-300 ${
                 isChecking ? "loading" : ""
               }`}
               onClick={handleCheckRecallsClick}
