@@ -82,7 +82,7 @@ function FAQPage() {
       <div className="collapse collapse-arrow bg-base-100 shadow">
         <input type="checkbox" />
         <div className="collapse-title text-lg font-medium">
-          Developer Information / Contact
+          Developer Information / Contact / Portfolio
         </div>
         <div className="collapse-content">
           <p className="text-sm opacity-80">
