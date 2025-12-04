@@ -1,4 +1,4 @@
-# Receipt Recall Checker (Frontend)
+# Receipt Recall Checker (Frontend) including continous deployment
 
 React/Vite frontend that lets users upload a receipt, extracts purchased items via the backend, and checks them against recent Canadian recall notices.
 
