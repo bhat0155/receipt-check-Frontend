@@ -1,0 +1,54 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "receipt-frontend/**"
+      - ".github/workflows/frontend-deploy.yml"
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Checkout your frontend repo code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # (Optional) Local build check in CI – this confirms the code compiles.
+      - name: Run frontend build (sanity check)
+        working-directory: receipt-frontend
+        run: |
+          npm ci
+          npm run build
+
+      # 2) SSH into EC2 and deploy latest frontend
+      - name: Deploy frontend to EC2
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Go to the frontend folder on the server
+            cd /home/ubuntu/receipt-check-Frontend/receipt-frontend
+
+            echo "Pulling latest code from main..."
+            git pull origin main
+
+            echo "Installing dependencies..."
+            npm ci
+
+            echo "Building Vite frontend..."
+            npm run build
+
+            echo "Copying build to /var/www/receipt-frontend..."
+            sudo rm -rf /var/www/receipt-frontend/*
+            sudo cp -r dist/* /var/www/receipt-frontend/
+
+            echo "Restarting nginx..."
+            sudo systemctl restart nginx
+
+            echo "Frontend deploy finished successfully."
